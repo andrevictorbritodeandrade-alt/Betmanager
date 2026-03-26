@@ -1,0 +1,66 @@
+{
+  "entities": {
+    "Bet": {
+      "title": "Bet",
+      "description": "A single bet entry",
+      "type": "object",
+      "properties": {
+        "match": { "type": "string" },
+        "house": { "type": "string" },
+        "odd": { "type": "number" },
+        "stake": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "won", "lost"] }
+      },
+      "required": ["match", "house", "odd", "stake", "status"]
+    },
+    "Day": {
+      "title": "Day",
+      "description": "Daily betting record",
+      "type": "object",
+      "properties": {
+        "day": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "won", "lost"] },
+        "withdrawal": { "type": "number" },
+        "protectCapital": { "type": "boolean" },
+        "bets": {
+          "type": "array",
+          "items": { "$ref": "#/entities/Bet" }
+        }
+      },
+      "required": ["day", "status", "withdrawal", "protectCapital", "bets"]
+    },
+    "MonthHistory": {
+      "title": "MonthHistory",
+      "description": "History for a specific month",
+      "type": "object",
+      "properties": {
+        "days": {
+          "type": "array",
+          "items": { "$ref": "#/entities/Day" }
+        },
+        "settings": {
+          "type": "object",
+          "properties": {
+            "stake": { "type": "number" },
+            "odd": { "type": "number" }
+          },
+          "required": ["stake", "odd"]
+        }
+      },
+      "required": ["days", "settings"]
+    },
+    "HistoryDocument": {
+      "title": "HistoryDocument",
+      "description": "The history document containing multiple months",
+      "type": "object",
+      "properties": {},
+      "additionalProperties": { "$ref": "#/entities/MonthHistory" }
+    }
+  },
+  "firestore": {
+    "/artifacts/{appId}/users/{userId}/settings/history": {
+      "schema": { "$ref": "#/entities/HistoryDocument" },
+      "description": "User's betting history and settings"
+    }
+  }
+}
